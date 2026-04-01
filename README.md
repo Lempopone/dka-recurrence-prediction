@@ -1,0 +1,182 @@
+# Clinical Decision Support System for DKA Recurrence
+
+## Overview
+
+Проект представляет собой end-to-end систему поддержки принятия врачебных решений для прогнозирования риска рецидива диабетического кетоацидоза (ДКА).
+
+Система объединяет:
+- продвинутый EDA и feature engineering  
+- обучение ансамбля моделей с оптимизацией под медицинские требования  
+- интерпретацию предсказаний (SHAP + клинические правила)  
+- API (FastAPI)  
+- пользовательский интерфейс (Streamlit)  
+
+Цель — не просто предсказать риск, а предоставить **интерпретируемый и клинически осмысленный вывод**.
+
+---
+
+ Data
+
+Данные не включены в репозиторий по причинам конфиденциальности.
+
+Необходимые файлы:
+- df.parquet
+- train_ids.json
+- test_ids.json
+- исходный Excel (опционально)
+
+Вы можете использовать собственные данные с аналогичной структурой.
+
+# Models
+
+Обученные модели не включены в репозиторий.
+
+Для воспроизведения:
+1. Запустить pipeline обучения (src/eda)
+2. Модели сохранятся автоматически
+
+Используется:
+- CatBoost (основная модель)
+- ансамбль по outer folds
+
+## Key Features
+
+- Прогноз вероятности рецидива (predict_proba)  
+- Интерпретация уровня риска (low / medium / high)  
+- Выделение ключевых факторов (SHAP)  
+- Автоматическое выявление:
+  - клинических отклонений  
+  - редких категорий  
+- Оценка надежности предсказания  
+- Разделение пациентов на train/test для прозрачности  
+
+---
+
+## Machine Learning Pipeline
+
+### Data Processing
+- Очистка данных (пропуски, квазиконстанты, выбросы)  
+- Типизация признаков  
+- Анализ распределений и мультимодальности  
+- Автоматический выбор трансформаций  
+
+---
+
+### Feature Engineering
+- Корреляционный анализ:
+  - парные корреляции  
+  - триадные зависимости  
+- Удаление избыточных признаков  
+- Работа с распределениями (log, yeo-johnson, robust scaling)  
+
+---
+
+### Model Training
+
+Использован ансамбль моделей:
+- CatBoost  
+- LightGBM  
+- XGBoost (tree + linear)  
+- Random Forest  
+- Logistic Regression  
+- Decision Tree  
+
+---
+
+### Advanced Techniques
+
+- Nested Cross-Validation (outer + inner CV)  
+- Hyperparameter tuning (Optuna)  
+- Class imbalance handling (`scale_pos_weight`, `class_weight`)  
+- Threshold optimization под медицинские ограничения:
+  - контроль recall  
+  - максимизация precision  
+
+---
+
+### Ensemble & Stacking
+
+- Усреднение предсказаний по фолдам  
+- Stacking (meta-model: Logistic Regression)  
+- Перебор комбинаций ансамблей  
+
+---
+
+### Model Evaluation
+
+- ROC-AUC (train / validation / test)  
+- OOF (out-of-fold) оценка  
+- Classification metrics:
+  - precision  
+  - recall  
+  - F1-score  
+- Подбор оптимального decision threshold  
+
+---
+
+## Interpretability
+
+- SHAP (TreeExplainer):
+  - локальная интерпретация пациента  
+  - глобальная важность признаков  
+
+- Клинический слой интерпретации:
+  - перевод вероятности в уровень риска  
+  - ключевые драйверы риска  
+  - выявление аномалий (z-score)  
+  - детекция редких категорий  
+
+---
+
+## System Architecture
+
+### Backend (FastAPI)
+- REST endpoint: `/predict/{medical_record_id}`  
+- Возвращает:
+  - prediction  
+  - probability  
+  - confidence  
+  - SHAP значения  
+  - клиническую интерпретацию  
+
+---
+
+### Frontend (Streamlit)
+- Ввод ID пациента  
+- Отображение:
+  - уровня риска  
+  - ключевых факторов  
+  - клинических отклонений  
+  - визуализации SHAP  
+  - вероятности модели  
+
+---
+
+## Tech Stack
+
+- Python  
+- Pandas / NumPy  
+- Scikit-learn  
+- CatBoost / LightGBM / XGBoost  
+- Optuna  
+- SHAP  
+- FastAPI  
+- Streamlit  
+- Plotly  
+
+---
+
+## Key Value
+
+Проект демонстрирует:
+- построение production-ready ML системы  
+- работу с медицинскими данными  
+- баланс между качеством модели и интерпретируемостью  
+- внедрение бизнес-логики (clinical layer) поверх ML  
+
+---
+
+## Author
+
+Data Scientist: **OVELSAD**
+
