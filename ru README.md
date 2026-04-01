@@ -1,6 +1,6 @@
-# Clinical Decision Support System for DKA Recurrence
+# Система поддержки принятия клинических решений при рецидиве диабетического кетоацидоза
 
-## Overview
+## Обзор
 
 Проект представляет собой end-to-end систему поддержки принятия врачебных решений для прогнозирования риска рецидива диабетического кетоацидоза (ДКА).
 
@@ -14,53 +14,40 @@
 Проект демонстрирует продвинутые практики ML-инженерии, такие как вложенная кросс-валидация (nested cross-validation), ансамблирование моделей, оптимизация гиперпараметров и интерпретируемость моделей (SHAP).
 
 Для более детального понимания системы см. следующие модули:
-- 'src/eda/README.md' — подробное описание feature engineering, анализа данных и пайплайна предобработки
-- 'src/README.md' — логика инференса модели, слой клинической интерпретации и архитектура сервиса
+- `src/eda/README.md` — подробное описание feature engineering, анализа данных и пайплайна предобработки  
+- `src/README.md` — логика инференса модели, слой клинической интерпретации и архитектура сервиса  
 
-Цель — не просто предсказать риск, а предоставить **интерпретируемый и клинически осмысленный вывод**.
+Цель проекта — не просто предсказать риск, а предоставить **интерпретируемый и клинически осмысленный вывод**.
 
 ---
 
-## Data Availability / Доступ к данным
+## Доступ к данным
 
-Due to confidentiality restrictions, the dataset is not publicly available.
 В связи с требованиями конфиденциальности исходные медицинские данные не публикуются в репозитории.
 
 Необходимые файлы:
-- df.parquet
-- train_ids.json
-- test_ids.json
-- исходный Excel (опционально)
+- df.parquet  
+- train_ids.json  
+- test_ids.json  
+- исходный Excel (опционально)  
 
 Вы можете использовать собственные данные с аналогичной структурой.
-
-## Project Scope
-
-This repository contains a full end-to-end machine learning system for predicting the risk of diabetic ketoacidosis (DKA) recurrence, including data preprocessing, model training, evaluation, and deployment via API and UI.
-
-The project demonstrates advanced ML engineering practices such as nested cross-validation, ensemble learning, hyperparameter optimization, and model interpretability (SHAP).
-
-For better understanding of the system, please refer to the following modules:
-- `src/eda/README.md` — detailed feature engineering, data analysis, and preprocessing pipeline  
-- `src/inference/README.md` — model inference logic, clinical interpretation layer, and service architecture
-## Models
 
 Обученные модели не включены в репозиторий.
 
 Для воспроизведения:
-1. Запустить pipeline обучения (src/eda)
-2. Модели сохранятся автоматически
+1. Запустить pipeline обучения (`src/eda`)  
+2. Модели сохранятся автоматически  
 
 Используется:
-- CatBoost (основная модель)
-- ансамбль по outer folds
+- CatBoost (основная модель)  
+- ансамбль по outer folds  
 
-
-
+---
 
 ## Key Features
 
-- Прогноз вероятности рецидива (predict_proba)  
+- Прогноз вероятности рецидива (`predict_proba`)  
 - Интерпретация уровня риска (low / medium / high)  
 - Выделение ключевых факторов (SHAP)  
 - Автоматическое выявление:
@@ -198,4 +185,3 @@ For better understanding of the system, please refer to the following modules:
 ## Author
 
 Data Scientist: **OVELSAD**
-
