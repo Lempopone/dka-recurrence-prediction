@@ -2,12 +2,12 @@
 
 ## System Overview
 
-Сервис предназначен для прогнозирования риска рецидива диабетического кетоацидоза (ДКА) и предоставления интерпретируемых клинических рекомендаций врачу.
+The service is designed to predict the risk of diabetic ketoacidosis (DKA) recurrence and provide interpretable clinical insights for physicians.
 
-Архитектура включает:
-- inference-слой (модели, объяснение, интерпретация)
-- API (FastAPI)
-- пользовательский интерфейс (Streamlit)
+The architecture includes:
+- inference layer (models, explanation, interpretation)  
+- API (FastAPI)  
+- user interface (Streamlit)  
 
 ---
 
@@ -16,63 +16,63 @@
 ### `clinical.py`
 
 #### `ClinicalInterpreter`
-Класс для клинической интерпретации предсказаний модели.
+A class for clinical interpretation of model predictions.
 
-**Основные функции:**
+**Core functionality:**
 
 ##### `risk_level(proba)`
-- Преобразует вероятность модели в категорию риска:
-  - Низкий риск  
-  - Умеренный риск  
-  - Высокий риск  
+- Converts model probability into risk categories:
+  - Low risk  
+  - Moderate risk  
+  - High risk  
 
 ---
 
 ##### `top_drivers(shap_dict, top_n=5)`
-- Определяет ключевые факторы, влияющие на прогноз
-- Сортирует признаки по абсолютному значению SHAP
-- Возвращает топ-N факторов с направлением влияния:
-  - увеличивает риск  
-  - снижает риск  
+- Identifies key factors influencing the prediction  
+- Sorts features by absolute SHAP values  
+- Returns top-N features with direction:
+  - increases risk  
+  - decreases risk  
 
 ---
 
 ##### `numeric_alerts(deviations)`
-- Анализ числовых отклонений
-- Использует z-score
-- Формирует алерты:
-  - значение выше нормы  
-  - значение ниже нормы  
+- Analyzes numerical deviations  
+- Uses z-score  
+- Generates alerts:
+  - above normal  
+  - below normal  
 
 ---
 
 ##### `categorical_alerts(X_row)`
-- Анализ категориальных признаков
-- Выявляет редкие категории (частота < 5%)
-- Формирует предупреждения  
+- Analyzes categorical features  
+- Detects rare categories (frequency < 5%)  
+- Generates warnings  
 
 ---
 
 ##### `build_alerts(deviations, X_row)`
-- Объединяет:
-  - числовые отклонения  
-  - редкие категории  
+- Combines:
+  - numerical deviations  
+  - rare categories  
 
 ---
 
 ##### `summary(risk_level)`
-- Формирует краткое клиническое заключение:
-  - высокий риск → требуется внимание  
-  - умеренный → наблюдение  
-  - низкий → отклонений нет  
+- Generates a clinical summary:
+  - high risk → requires attention  
+  - moderate → monitoring recommended  
+  - low → no significant deviations  
 
 ---
 
 ##### `build_response(...)`
-- Собирает итоговый ответ:
-  - уровень риска  
-  - ключевые факторы  
-  - алерты  
+- Constructs the final response:
+  - risk level  
+  - key drivers  
+  - alerts  
   - summary  
 
 ---
@@ -80,24 +80,24 @@
 ### `explain.py`
 
 #### `Explainer`
-Класс для интерпретации модели.
+A class for model interpretability.
 
 ##### `shap_values(X)`
-- Вычисляет SHAP значения  
+- Computes SHAP values  
 
 ---
 
 ##### `feature_importance_patient(X)`
-- Возвращает SHAP значения для конкретного пациента  
+- Returns SHAP values for a specific patient  
 
 ---
 
 ##### `detect_outliers(X_row, df_reference)`
-- Вычисляет z-score для каждого признака  
-- Определяет выбросы при |z| > 2  
-- Возвращает отклонения:
-  - значение  
-  - среднее  
+- Computes z-score for each feature  
+- Detects outliers where |z| > 2  
+- Returns:
+  - value  
+  - mean  
   - z-score  
 
 ---
@@ -105,24 +105,24 @@
 ### `predictor.py`
 
 #### `DKAPredictor`
-Класс для ансамблевого предсказания.
+A class for ensemble prediction.
 
 ##### `predict_proba(X)`
-- Усредняет вероятности от нескольких моделей (folds)
-- Возвращает итоговую вероятность  
+- Averages probabilities across multiple models (folds)  
+- Returns final probability  
 
 ---
 
 ##### `predict(X)`
-- Бинарное предсказание:
-  - 1 — рецидив  
-  - 0 — нет  
+- Binary prediction:
+  - 1 — recurrence  
+  - 0 — no recurrence  
 
 ---
 
 ##### `confidence(proba)`
-- Оценивает надежность прогноза
-- Основано на расстоянии до threshold:
+- Estimates prediction reliability  
+- Based on distance from threshold:
   - LOW  
   - MEDIUM  
   - HIGH  
@@ -132,14 +132,14 @@
 ### `loader.py`
 
 #### `load_models()`
-- Загружает ансамбль моделей (CatBoost)
-- Использует k-fold подход (5 моделей)
+- Loads ensemble of CatBoost models  
+- Uses k-fold approach (5 models)  
 
 ---
 
 #### `load_threshold()`
-- Загружает threshold из JSON  
-- Использует медианное значение  
+- Loads threshold from JSON  
+- Uses median value  
 
 ---
 
@@ -147,35 +147,35 @@
 
 ### `app.py`
 
-#### Основная логика:
-- Загрузка:
-  - датасета  
-  - моделей  
+#### Main logic:
+- Loads:
+  - dataset  
+  - models  
   - threshold  
 
 ---
 
 #### Endpoint: `/predict/{medical_record_id}`
 
-##### Выполняет:
-1. Проверку наличия пациента  
-2. Формирование признаков  
-3. Предсказание модели:
-   - вероятность (`proba`)  
-   - класс (`prediction`)  
+##### Performs:
+1. Patient existence validation  
+2. Feature preparation  
+3. Model prediction:
+   - probability (`proba`)  
+   - class (`prediction`)  
    - confidence  
 
-4. Интерпретацию:
-   - SHAP значения  
-   - отклонения  
-   - клинический вывод  
+4. Interpretation:
+   - SHAP values  
+   - deviations  
+   - clinical insights  
 
-5. Определение принадлежности:
+5. Dataset membership:
    - train / test / unknown  
 
 ---
 
-##### Возвращает:
+##### Returns:
 - prediction  
 - proba  
 - confidence  
@@ -193,79 +193,79 @@
 
 ### `app.py`
 
-#### Основной функционал:
+#### Core functionality:
 
-##### Ввод:
-- ID пациента (история болезни)
-
----
-
-##### Отображение результатов:
-
-###### 1. Уровень риска
-- Категория риска  
-- Краткое описание  
+##### Input:
+- Patient ID (medical record ID)  
 
 ---
 
-###### 2. Метрики модели
-- Прогноз (рецидив / нет)  
-- Надежность (confidence)  
+##### Output:
+
+###### 1. Risk Level
+- Risk category  
+- Short description  
 
 ---
 
-###### 3. Информация о данных
+###### 2. Model Metrics
+- Prediction (recurrence / no recurrence)  
+- Confidence  
+
+---
+
+###### 3. Dataset Info
 - train  
 - test  
 - unknown  
 
 ---
 
-###### 4. Ключевые факторы риска
-- Топ признаков (SHAP)  
-- Направление влияния  
+###### 4. Key Risk Factors
+- Top features (SHAP)  
+- Direction of impact  
 
 ---
 
-###### 5. Клинические отклонения
-- Числовые аномалии  
-- Редкие категории  
+###### 5. Clinical Deviations
+- Numerical anomalies  
+- Rare categories  
 
 ---
 
-###### 6. Визуализация
-- Bar chart факторов риска (Plotly)  
-- Топ-10 признаков  
+###### 6. Visualization
+- Risk factor bar chart (Plotly)  
+- Top-10 features  
 
 ---
 
-###### 7. Вероятность модели
-- Отображение `predict_proba`  
-- Числовое значение риска  
+###### 7. Model Probability
+- `predict_proba` output  
+- Numerical risk value  
 
 ---
 
 ## 4. Data Flow
 
-1. Пользователь вводит ID пациента  
-2. UI отправляет запрос в API  
+1. User inputs patient ID  
+2. UI sends request to API  
 3. API:
-   - извлекает данные  
-   - считает прогноз  
-   - интерпретирует результат  
-4. Ответ возвращается в UI  
-5. UI визуализирует:
-   - риск  
-   - факторы  
-   - отклонения  
-   - вероятность  
+   - retrieves data  
+   - generates prediction  
+   - interprets results  
+4. Response is returned to UI  
+5. UI visualizes:
+   - risk  
+   - drivers  
+   - deviations  
+   - probability  
 
 ---
 
 ## 5. Key Characteristics
 
-- Интерпретируемость (SHAP + клинические правила)  
-- Ансамбль моделей (устойчивость)  
-- Автоматический анализ отклонений  
-- Разделение train/test для прозрачности  
-- Поддержка клинических решений  
+- Interpretability (SHAP + clinical rules)  
+- Ensemble models (robustness)  
+- Automatic deviation detection  
+- Transparent train/test split  
+- Clinical decision support  

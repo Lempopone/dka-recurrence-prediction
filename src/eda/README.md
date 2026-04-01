@@ -3,170 +3,140 @@
 ## 1. Preprocessing Functions
 
 ### `change_cols_names()`
-- Переименовывание русскоязычных названий колонок на английские
+- Renames Russian column names to English  
 
 ---
 
 ### `del_cols()`
-- Удаляет:
-  - колонки с ≥ 60% пропусков  
-  - дубликаты строк  
-  - строки с пропусками таргета  
-  - квазиконстантные признаки  
-  - мусорные колонки по заданному объекту `list`  
-- Переносит "историю болезни" в индекс  
+- Removes:
+  - columns with ≥ 60% missing values  
+  - duplicate rows  
+  - rows with missing target  
+  - quasi-constant features  
+  - predefined noisy columns  
+- Sets medical record ID as index  
 
 ---
 
 ### `set_dtype()`
-- Определяет и устанавливает нужную типизацию:
-  - `object`
-  - `category`
-  - `float`
-  - `int`
-- Корректирует типы при необходимости  
+- Assigns appropriate data types:
+  - `object`  
+  - `category`  
+  - `float`  
+  - `int`  
+- Adjusts types if necessary  
 
 ---
 
 ### `basic_info()`
-- Выводит таблицу:
-  - кол-во пропусков  
-  - % пропусков  
-  - кол-во уникальных значений  
-  - тип данных  
-  - размер датасета (до / после)  
+- Outputs summary table:
+  - missing values count  
+  - missing percentage  
+  - unique values  
+  - data types  
+  - dataset size (before / after)  
 
 ---
 
 ## 2. Correlation Functions
 
 ### `get_corr_duo()`
-- Перебирает матрицу корреляций по Пирсону  
-- Отбирает топ пары  
+- Computes Pearson correlation matrix  
+- Extracts top correlated feature pairs  
 
 ---
 
 ### `get_corr_triad()`
-- Поиск триад корреляций вида:  
+- Searches triads of the form:  
   `a ≈ alpha * b + beta * c`  
-- Полный перебор всех перестановок  
+- Exhaustive combinations  
 
 ---
 
 ### `del_corr_duo()`
-- Удаляет по порогу парные корреляции (колонку/колонки)  
-- Выводит список удаленных колонок  
+- Removes highly correlated feature pairs  
+- Returns dropped columns  
 
 ---
 
 ### `del_corr_triad()`
-- По созданному датафрейму триадных корреляций:
-  - отсекает триады по порогу  
-  - считает p-value каждой из 3 колонок к таргету  
-  - удаляет наиболее статистически-незначимую  
-- Выводит список удаленных колонок  
+- Processes triads:
+  - filters by threshold  
+  - computes p-values vs target  
+  - removes least significant feature  
 
 ---
 
-## 3. Visualization and Anomaly Detection Functions
+## 3. Visualization and Anomaly Detection
 
 ### `detect_anomaly()`
-- Для каждой колонки проверяет наличие аномалий  
-- При наличии — удаляет  
+- Detects anomalies per feature  
+- Removes if necessary  
 
 ---
 
 ### `analyze_shape()`
-- Определение мультимодальности распределения  
-- Основано на пиках плотности распределения  
+- Detects multimodal distributions  
+- Based on density peaks  
 
 ---
 
 ### `compute_ecdf(series)`
-- Создание эмпирической функции распределения  
+- Builds empirical CDF  
 
 ---
 
 ### `analyze_distributions()`
 
-#### Для числовых колонок:
-- Гистограмма распределения  
-- Ящик с усами по таргету  
-- Violin-график по таргету  
+#### Numerical features:
+- Histogram  
+- Boxplot (by target)  
+- Violin plot  
 - ECDF  
-- Логистическая гистограмма распределения  
-- Статистические метрики:
-  - медиана  
-  - среднее  
-  - дисперсия  
-  - IQR и др.  
+- Log histogram  
+- Metrics:
+  - median  
+  - mean  
+  - variance  
+  - IQR  
 
-#### Для категориальных и бинарных:
-- Баланс классов по секторам  
-- Распределение классов по таргету  
+#### Categorical features:
+- Class balance  
+- Target distribution  
 
-- Сохранение атрибутов каждой колонки в словарь  
+- Stores feature metadata  
 
 ---
 
-## 4. Distribution Transformation Functions
+## 4. Distribution Transformations
 
 ### `decide_transformations()`
-- На основе:
-  - `skew`  
-  - `multimodal`  
-  - `outliers_ratio`  
 
-- Выбирает метод трансформации:
-  - `log` (если `min > 0`)  
-  - `log1p` (если `min ≥ 0`)  
-  - `yeo_johnson` (если есть отрицательные значения)  
-  - `reflect_log` (при `skew < -1`)  
-  - `robust` (при `|skew| > 0.5` и выбросах > 3%)  
-  - `None` (мультимодальные или нормальные распределения)  
+Based on:
+- skewness  
+- multimodality  
+- outlier ratio  
+
+Methods:
+- `log`  
+- `log1p`  
+- `yeo_johnson`  
+- `reflect_log`  
+- `robust`  
+- `None`  
 
 ---
 
 ### `apply_transformations()`
-- Применяет выбранные трансформации к колонкам  
-- Возвращает преобразованный датафрейм  
+- Applies transformations  
+- Returns transformed dataset  
 
 ---
 
-## 5. Modeling and Training Pipeline
+## 5. Modeling Pipeline
 
 ### `get_models()`
-- Возвращает набор моделей:
-  - XGBoost (tree / linear)  
-  - Logistic Regression  
-  - LightGBM  
-  - Random Forest  
-  - Decision Tree  
-  - CatBoost  
-
----
-
-### `get_preprocessor(model_name, cat_cols, num_cols)`
-- Формирует препроцессинг в зависимости от модели:
-
-#### Для `catboost`:
-- Без преобразований (`passthrough`)
-
-#### Для `logreg`:
-- StandardScaler для числовых  
-- OneHotEncoder для категориальных  
-
-#### Для остальных моделей:
-- OneHotEncoder для категориальных  
-- Числовые — без изменений  
-
----
-
-### `get_optuna_params(trial, model_name)`
-- Генерация гиперпараметров для моделей через Optuna  
-- Учитывает дисбаланс классов (`scale_pos_weight`)  
-
-#### Поддерживаемые модели:
+Returns models:
 - XGBoost (tree / linear)  
 - Logistic Regression  
 - LightGBM  
@@ -176,129 +146,104 @@
 
 ---
 
-## 6. Threshold Optimization
+### `get_preprocessor(...)`
+Builds preprocessing pipeline:
 
-### `find_best_threshold(y_true, y_pred, min_recall=0.7)`
-- Подбор оптимального порога классификации  
-
-#### Логика:
-- Перебор threshold ∈ [0.01, 0.99]  
-- Ограничение: recall ≥ заданного уровня  
-- Цель: максимизация precision  
-
-#### Если условие не выполнено:
-- Выбирается threshold с минимальным отклонением по recall  
+- `catboost` → passthrough  
+- `logreg` → scaling + OHE  
+- others → OHE  
 
 ---
 
-## 7. Nested Cross-Validation Training
+### `get_optuna_params(...)`
+- Hyperparameter generation via Optuna  
+- Handles class imbalance  
+
+---
+
+## 6. Threshold Optimization
+
+### `find_best_threshold(...)`
+
+- Searches threshold ∈ [0.01, 0.99]  
+- Constraint: recall ≥ target  
+- Objective: maximize precision  
+
+Fallback:
+- closest recall match  
+
+---
+
+## 7. Nested Cross-Validation
 
 ### `train_full_pipeline_nested_cv(...)`
 
-Полный цикл обучения моделей с nested CV.
+Full training pipeline:
 
-#### Этапы:
-
-1. Разделение данных:
-   - train / test (stratified)
-
-2. Outer CV:
-   - оценка модели  
-
-3. Inner CV:
-   - подбор гиперпараметров (Optuna)  
-
-4. Обучение модели:
-   - с учетом препроцессинга  
-
-5. Расчет threshold:
-   - с учетом медицинского ограничения (recall)  
-
-6. Сохранение моделей:
-   - по каждому outer fold  
+1. Train/test split  
+2. Outer CV  
+3. Inner CV (Optuna)  
+4. Model training  
+5. Threshold selection  
+6. Model saving  
 
 ---
 
-#### Сохраняемые результаты:
-- OOF предсказания  
-- Предсказания на тесте  
-- Метрики по фолдам  
-- Лучшие параметры  
-- Thresholds  
+Outputs:
+- OOF predictions  
+- test predictions  
+- metrics  
+- best params  
+- thresholds  
 
 ---
 
 ## 8. Model Evaluation
 
-### `summarize_results(results, y_train, y_test)`
-- Вывод агрегированных метрик:
+### `summarize_results(...)`
 
-#### Метрики:
-- ROC-AUC (train / val / test)  
-- Стандартное отклонение  
+Metrics:
+- ROC-AUC  
+- standard deviation  
 
-#### Дополнительно:
-- Медианный threshold  
-- Classification report:
-  - train (OOF)  
-  - test  
+Additional:
+- median threshold  
+- classification report  
 
 ---
 
 ## 9. Stacking
 
-### `train_stacking_meta_model(results, model_names, y_train, y_test)`
-- Обучение мета-модели (Logistic Regression)
-
-#### Использует:
-- OOF предсказания как признаки (train)  
-- Test predictions как признаки (test)  
-
-#### Выход:
-- AUC на train и test  
-- Обученная meta-модель  
+### `train_stacking_meta_model(...)`
+- Trains meta-model (LogReg)  
 
 ---
 
-### `search_best_stacking_combinations(results, y_train, y_test)`
-- Перебор всех комбинаций моделей  
-
-#### Логика:
-- Перебор ансамблей размерности от 2 до N  
-- Обучение meta-модели  
-- Оценка по ROC-AUC  
-
-#### Результат:
-- Отсортированный список комбинаций по качеству  
+### `search_best_stacking_combinations(...)`
+- Searches model combinations  
+- Evaluates via ROC-AUC  
 
 ---
 
 ## 10. SHAP Analysis
 
-### `run_catboost_shap_ensemble(model_dir, X_test)`
-- Интерпретация ансамбля CatBoost моделей  
+### `run_catboost_shap_ensemble(...)`
 
-#### Логика:
-1. Загрузка моделей (5 фолдов)  
-2. Расчет SHAP значений для каждой модели  
-3. Усреднение SHAP  
+- Loads models  
+- Computes SHAP  
+- Averages results  
 
----
-
-#### Визуализация:
-- Summary plot (dot)  
-- Feature importance (bar)  
+Visualization:
+- summary plot  
+- feature importance  
 
 ---
 
-## 11. Key Characteristics of Training Pipeline
+## 11. Key Characteristics
 
-- Nested cross-validation (устойчивость оценки)  
-- Optuna hyperparameter tuning  
-- Балансировка классов  
-- Оптимизация threshold под recall  
-- Сохранение моделей по фолдам  
-- Поддержка ансамблей и стекинга  
-- Интерпретируемость через SHAP  
-
----
+- Nested CV  
+- Optuna tuning  
+- Class balancing  
+- Threshold optimization  
+- Ensemble methods  
+- SHAP interpretability  
