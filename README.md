@@ -14,7 +14,7 @@ The system combines:
 The project demonstrates advanced ML engineering practices such as nested cross-validation, ensemble learning, hyperparameter optimization, and model interpretability (SHAP).
 
 For a deeper understanding of the system, refer to:
-- [detailed feature engineering, data analysis, and preprocessing pipeline](src/eda/README_EDA.md)  
+- [detailed feature engineering, data analysis, and preprocessing pipeline](src/eda/README_eda.md)  
 - [model inference logic, clinical interpretation layer, and service architecture](src/README_inference.md)  
 
 The goal is not only to predict risk, but to provide **interpretable and clinically meaningful insights**.
